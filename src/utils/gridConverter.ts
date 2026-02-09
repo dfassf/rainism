@@ -25,7 +25,6 @@ export function convertToGridCoordinates(lat: number, lon: number): GridCoordina
   const YO = 136; // 기준점 Y좌표
 
   const DEGRAD = Math.PI / 180.0;
-  const RADDEG = 180.0 / Math.PI;
 
   const re = RE / GRID;
   const slat1 = SLAT1 * DEGRAD;

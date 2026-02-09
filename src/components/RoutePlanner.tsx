@@ -9,7 +9,7 @@ interface RoutePlannerProps {
 
 export function RoutePlanner({ apiKey }: RoutePlannerProps) {
   const [points, setPoints] = useState<RoutePoint[]>([]);
-  const [segments, setSegments] = useState<RouteSegment[]>([]);
+  const [, setSegments] = useState<RouteSegment[]>([]);
   const [analysis, setAnalysis] = useState<RouteRainfallAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -100,7 +100,7 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
           </div>
         </div>
 
-        {points.map((point, index) => (
+        {points.map((point) => (
           <div key={point.id} className="point-input-card">
             <div className="point-header">
               <span className={`point-type-badge point-type-${point.type}`}>

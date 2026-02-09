@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { GridCoordinates } from '../utils/gridConverter';
 
 /**
  * 기상청 초단기강수예측 API 응답 타입

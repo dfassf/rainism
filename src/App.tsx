@@ -8,7 +8,7 @@ import { RoutePlanner } from './components/RoutePlanner';
 import './App.css';
 
 function App() {
-  const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [, setLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [forecasts, setForecasts] = useState<RainfallForecast[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -89,7 +89,7 @@ function App() {
           const precipitationType = data.PTY
             ? weatherService.getPrecipitationType(data.PTY)
             : '없음';
-          const needsUmbrella = precipitation > 0 || (data.PTY && data.PTY !== '0');
+          const needsUmbrella = Boolean(precipitation > 0 || (data.PTY && data.PTY !== '0'));
 
           return {
             time: `${hour}:${minute}`,
