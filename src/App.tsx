@@ -4,6 +4,7 @@ import { convertToGridCoordinates } from './utils/gridConverter';
 import { WeatherApiService } from './services/weatherApi';
 import { RainfallForecast } from './types';
 import { makeUmbrellaDecision, UmbrellaDecision } from './utils/umbrellaDecision';
+import { RoutePlanner } from './components/RoutePlanner';
 import './App.css';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string>('');
   const [travelTime, setTravelTime] = useState<number>(30); // 기본 이동 시간 30분
+  const [mode, setMode] = useState<'current' | 'route'>('current'); // 현재 위치 / 경로 모드
 
   useEffect(() => {
     // 환경 변수에서 API 키 가져오기
@@ -136,11 +138,27 @@ function App() {
   }, [forecasts, travelTime]);
 
   if (!apiKey) {
-    return (
-      <div className="app">
-        <div className="container">
-          <h1>🌧️ Rainism</h1>
-          <p className="subtitle">우산 결정 도우미</p>
+  return (
+    <div className="app">
+      <div className="container">
+        <h1>🌧️ Rainism</h1>
+        <p className="subtitle">우산 결정 도우미</p>
+
+        {/* 모드 전환 탭 */}
+        <div className="mode-tabs">
+          <button
+            className={`mode-tab ${mode === 'current' ? 'active' : ''}`}
+            onClick={() => setMode('current')}
+          >
+            📍 현재 위치
+          </button>
+          <button
+            className={`mode-tab ${mode === 'route' ? 'active' : ''}`}
+            onClick={() => setMode('route')}
+          >
+            🗺️ 경로별 예보
+          </button>
+        </div>
           <form onSubmit={handleApiKeySubmit} className="api-key-form">
             <label htmlFor="apiKey">기상청 API 키를 입력하세요:</label>
             <input
@@ -179,7 +197,23 @@ function App() {
     <div className="app">
       <div className="container">
         <h1>🌧️ Rainism</h1>
-        <p className="subtitle">초단기강수예측 서비스</p>
+        <p className="subtitle">우산 결정 도우미</p>
+
+        {/* 모드 전환 탭 */}
+        <div className="mode-tabs">
+          <button
+            className={`mode-tab ${mode === 'current' ? 'active' : ''}`}
+            onClick={() => setMode('current')}
+          >
+            📍 현재 위치
+          </button>
+          <button
+            className={`mode-tab ${mode === 'route' ? 'active' : ''}`}
+            onClick={() => setMode('route')}
+          >
+            🗺️ 경로별 예보
+          </button>
+        </div>
 
         {loading ? (
           <div className="loading">날씨 정보를 불러오는 중...</div>
@@ -192,21 +226,25 @@ function App() {
           </div>
         ) : (
           <>
-            {/* 이동 시간 설정 */}
-            <div className="travel-time-setting">
-              <label htmlFor="travelTime">예상 이동 시간:</label>
-              <select
-                id="travelTime"
-                value={travelTime}
-                onChange={(e) => setTravelTime(Number(e.target.value))}
-                className="travel-time-select"
-              >
-                <option value={15}>15분</option>
-                <option value={30}>30분</option>
-                <option value={45}>45분</option>
-                <option value={60}>60분</option>
-              </select>
-            </div>
+            {mode === 'route' ? (
+              <RoutePlanner apiKey={apiKey} />
+            ) : (
+              <>
+                {/* 이동 시간 설정 */}
+                <div className="travel-time-setting">
+                  <label htmlFor="travelTime">예상 이동 시간:</label>
+                  <select
+                    id="travelTime"
+                    value={travelTime}
+                    onChange={(e) => setTravelTime(Number(e.target.value))}
+                    className="travel-time-select"
+                  >
+                    <option value={15}>15분</option>
+                    <option value={30}>30분</option>
+                    <option value={45}>45분</option>
+                    <option value={60}>60분</option>
+                  </select>
+                </div>
 
             {/* 우산 결정 카드 - 핵심 UI */}
             {decision && (
@@ -277,9 +315,11 @@ function App() {
               <div className="no-data">예보 데이터를 불러오는 중...</div>
             )}
 
-            <button onClick={loadWeatherData} className="refresh-button">
-              🔄 새로고침
-            </button>
+                <button onClick={loadWeatherData} className="refresh-button">
+                  🔄 새로고침
+                </button>
+              </>
+            )}
           </>
         )}
       </div>
