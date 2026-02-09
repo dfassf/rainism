@@ -1,0 +1,557 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.container {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 800px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: #333;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+}
+
+.api-key-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.api-key-form label {
+  font-weight: 600;
+  color: #333;
+}
+
+.api-key-input {
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.api-key-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.submit-button,
+.refresh-button,
+.retry-button {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.submit-button:hover,
+.refresh-button:hover,
+.retry-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.submit-button:active,
+.refresh-button:active,
+.retry-button:active {
+  transform: translateY(0);
+}
+
+.info-box {
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.info-box p {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.info-box ol {
+  margin-left: 20px;
+  color: #666;
+}
+
+.info-box a {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.info-box a:hover {
+  text-decoration: underline;
+}
+
+.location-info {
+  background: #e3f2fd;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.location-info p {
+  color: #1976d2;
+  font-weight: 500;
+}
+
+/* 이동 시간 설정 */
+.travel-time-setting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.travel-time-setting label {
+  font-weight: 600;
+  color: #333;
+}
+
+.travel-time-select {
+  padding: 8px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.travel-time-select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+/* 우산 결정 카드 - 핵심 UI */
+.decision-card {
+  margin-bottom: 30px;
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.decision-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+.decision-card.decision-bring {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border: 3px solid #ff9800;
+}
+
+.decision-card.decision-optional {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border: 3px solid #2196f3;
+}
+
+.decision-card.decision-skip {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border: 3px solid #4caf50;
+}
+
+.decision-icon {
+  font-size: 4rem;
+  margin-bottom: 15px;
+}
+
+.decision-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.decision-card.decision-bring .decision-title {
+  color: #e65100;
+}
+
+.decision-card.decision-optional .decision-title {
+  color: #1565c0;
+}
+
+.decision-card.decision-skip .decision-title {
+  color: #2e7d32;
+}
+
+.decision-score {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.decision-message {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.decision-details {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.detail-item {
+  padding: 8px 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* 행동 기준 설명 */
+.action-explanation {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-left: 4px solid #667eea;
+}
+
+.explanation-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.explanation-content {
+  color: #555;
+  line-height: 1.6;
+}
+
+.explanation-content p {
+  margin: 0;
+}
+
+.explanation-content strong {
+  color: #333;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.error {
+  text-align: center;
+  padding: 40px;
+  color: #d32f2f;
+}
+
+.error p {
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+.forecast-container {
+  margin-top: 30px;
+}
+
+.forecast-container h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.forecast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.forecast-card {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.forecast-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.forecast-time {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.forecast-precipitation {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1976d2;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.rain-icon {
+  font-size: 1.8rem;
+}
+
+.no-rain {
+  color: #4caf50;
+}
+
+.forecast-type {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.forecast-card.needs-umbrella {
+  border: 2px solid #ff9800;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+}
+
+.umbrella-badge {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #f57c00;
+  font-weight: 600;
+}
+
+/* 우산 알림 */
+.umbrella-alert {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border: 2px solid #ff9800;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(255, 152, 0, 0);
+  }
+}
+
+.umbrella-icon {
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.umbrella-content h3 {
+  margin: 0 0 5px 0;
+  color: #e65100;
+  font-size: 1.2rem;
+}
+
+.umbrella-content p {
+  margin: 0;
+  color: #bf360c;
+  font-size: 0.95rem;
+}
+
+/* 요약 정보 */
+.summary-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.summary-item {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.summary-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.summary-value {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1976d2;
+}
+
+/* 강수량 차트 */
+.rainfall-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 150px;
+  margin-bottom: 30px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  gap: 5px;
+}
+
+.chart-bar-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.chart-bar {
+  width: 100%;
+  min-height: 5px;
+  border-radius: 4px 4px 0 0;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.chart-bar.no-rain {
+  background: #c8e6c9;
+}
+
+.chart-bar.light-rain {
+  background: #81d4fa;
+}
+
+.chart-bar.moderate-rain {
+  background: #42a5f5;
+}
+
+.chart-bar.heavy-rain {
+  background: #1976d2;
+}
+
+.chart-bar:hover {
+  opacity: 0.8;
+  transform: scaleY(1.05);
+}
+
+.chart-time {
+  margin-top: 5px;
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* 강수량 색상 클래스 */
+.forecast-precipitation.no-rain {
+  color: #4caf50;
+}
+
+.forecast-precipitation.light-rain {
+  color: #03a9f4;
+}
+
+.forecast-precipitation.moderate-rain {
+  color: #2196f3;
+}
+
+.forecast-precipitation.heavy-rain {
+  color: #1976d2;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-size: 1.1rem;
+}
+
+.refresh-button {
+  width: 100%;
+  margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .decision-card {
+    padding: 20px;
+  }
+
+  .decision-icon {
+    font-size: 3rem;
+  }
+
+  .decision-title {
+    font-size: 1.5rem;
+  }
+
+  .decision-message {
+    font-size: 1rem;
+  }
+
+  .travel-time-setting {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
