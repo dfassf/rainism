@@ -9,7 +9,7 @@ body {
     'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #D6EFFF;
   min-height: 100vh;
 }
 
@@ -66,14 +66,14 @@ h1 {
 }
 
 .mode-tab:hover {
-  color: #667eea;
-  background: #f5f5f5;
+  color: #3182F6;
+  background: #F2F8FF;
 }
 
 .mode-tab.active {
-  color: #667eea;
-  border-bottom-color: #667eea;
-  background: #f5f5f5;
+  color: #3182F6;
+  border-bottom-color: #3182F6;
+  background: #F2F8FF;
 }
 
 .api-key-form {
@@ -98,28 +98,29 @@ h1 {
 
 .api-key-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #3182F6;
 }
 
 .submit-button,
 .refresh-button,
 .retry-button {
   padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #3182F6;
   color: white;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
 .submit-button:hover,
 .refresh-button:hover,
 .retry-button:hover {
+  background: #1B64DA;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 5px 15px rgba(49, 130, 246, 0.4);
 }
 
 .submit-button:active,
@@ -146,7 +147,7 @@ h1 {
 }
 
 .info-box a {
-  color: #667eea;
+  color: #3182F6;
   text-decoration: none;
 }
 
@@ -196,7 +197,7 @@ h1 {
 
 .travel-time-select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #3182F6;
 }
 
 /* 우산 결정 카드 - 핵심 UI */
@@ -215,17 +216,17 @@ h1 {
 }
 
 .decision-card.decision-bring {
-  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  background: #fff3e0;
   border: 3px solid #ff9800;
 }
 
 .decision-card.decision-optional {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-  border: 3px solid #2196f3;
+  background: #E5F3FF;
+  border: 3px solid #3182F6;
 }
 
 .decision-card.decision-skip {
-  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  background: #e8f5e9;
   border: 3px solid #4caf50;
 }
 
@@ -283,11 +284,11 @@ h1 {
 
 /* 행동 기준 설명 */
 .action-explanation {
-  background: #f9f9f9;
+  background: #F2F8FF;
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 20px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #3182F6;
 }
 
 .explanation-title {
@@ -347,7 +348,7 @@ h1 {
 }
 
 .forecast-card {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: #F2F8FF;
   padding: 20px;
   border-radius: 12px;
   text-align: center;
@@ -392,7 +393,7 @@ h1 {
 
 .forecast-card.needs-umbrella {
   border: 2px solid #ff9800;
-  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  background: #fff3e0;
 }
 
 .umbrella-badge {
@@ -407,7 +408,7 @@ h1 {
   display: flex;
   align-items: center;
   gap: 15px;
-  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  background: #fff3e0;
   border: 2px solid #ff9800;
   border-radius: 12px;
   padding: 20px;

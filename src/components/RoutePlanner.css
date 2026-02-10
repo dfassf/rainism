@@ -4,8 +4,54 @@
 
 .route-subtitle {
   color: #666;
-  margin-bottom: 20px;
+  margin-bottom: 8px;
   font-size: 0.95rem;
+}
+
+.data-source {
+  color: #999;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+/* 초기 로딩 */
+.initial-loading {
+  text-align: center;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #F2F8FF 0%, #E5F3FF 100%);
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.loading-spinner {
+  font-size: 3rem;
+  animation: pulse 1.5s ease-in-out infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
+}
+
+.initial-loading p {
+  margin: 8px 0;
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.loading-hint {
+  font-size: 0.9rem !important;
+  color: #666 !important;
+  font-weight: normal !important;
 }
 
 .points-container {
@@ -31,7 +77,7 @@
 
 .add-point-btn {
   padding: 8px 16px;
-  background: #667eea;
+  background: #3182F6;
   color: white;
   border: none;
   border-radius: 6px;
@@ -40,13 +86,18 @@
   transition: background 0.2s;
 }
 
-.add-point-btn:hover {
-  background: #5568d3;
+.add-point-btn:hover:not(:disabled) {
+  background: #1B64DA;
+}
+
+.add-point-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .point-input-card {
-  background: #f9f9f9;
-  border: 2px solid #e0e0e0;
+  background: #F2F8FF;
+  border: 2px solid #E5F3FF;
   border-radius: 8px;
   padding: 15px;
   margin-bottom: 15px;
@@ -89,7 +140,7 @@
 
 .point-name-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #3182F6;
 }
 
 .coordinate-inputs {
@@ -107,7 +158,7 @@
 
 .coordinate-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #3182F6;
 }
 
 .point-note {
@@ -117,21 +168,94 @@
   font-style: italic;
 }
 
+/* 선택된 위치 표시 */
+.selected-location {
+  background: white;
+  border: 2px solid #3182F6;
+  border-radius: 8px;
+  padding: 12px;
+  position: relative;
+}
+
+.selected-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #14171a;
+  margin-bottom: 4px;
+}
+
+.selected-coords {
+  font-size: 0.85rem;
+  color: #657786;
+  font-family: monospace;
+  margin-bottom: 8px;
+}
+
+.change-location-btn {
+  padding: 6px 12px;
+  background: #F2F8FF;
+  color: #14171a;
+  border: 1px solid #E5F3FF;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.change-location-btn:hover {
+  background: #E5F3FF;
+  border-color: #3182F6;
+}
+
+/* 고급 옵션 */
+.advanced-options {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.toggle-coords-btn {
+  padding: 8px 12px;
+  background: transparent;
+  color: #3182F6;
+  border: 1px solid #3182F6;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.toggle-coords-btn:hover {
+  background: #3182F6;
+  color: white;
+}
+
+.advanced-options .coordinate-inputs {
+  margin-top: 12px;
+}
+
+.advanced-options .point-name-input {
+  grid-column: 1 / -1;
+  margin-top: 10px;
+}
+
 .analyze-btn {
   width: 100%;
   padding: 15px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #3182F6;
   color: white;
   border: none;
   border-radius: 8px;
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: all 0.2s;
   margin-bottom: 20px;
 }
 
 .analyze-btn:hover:not(:disabled) {
+  background: #1B64DA;
   transform: translateY(-2px);
 }
 
@@ -163,12 +287,12 @@
 }
 
 .overall-decision.decision-bring {
-  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  background: #fff3e0;
   border: 3px solid #ff9800;
 }
 
 .overall-decision.decision-skip {
-  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  background: #e8f5e9;
   border: 3px solid #4caf50;
 }
 

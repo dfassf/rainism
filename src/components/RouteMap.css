@@ -1,0 +1,93 @@
+.route-map-container {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+}
+
+.route-map-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F2F8FF;
+  border-radius: 12px;
+  border: 2px dashed #E5F3FF;
+}
+
+.route-map-empty p {
+  color: #657786;
+  font-size: 14px;
+}
+
+/* 마커 팝업 스타일 */
+.marker-popup {
+  font-family: inherit;
+}
+
+.popup-type {
+  font-size: 13px;
+  color: #657786;
+  margin-bottom: 4px;
+}
+
+.popup-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #14171a;
+  margin-bottom: 4px;
+}
+
+.popup-coords {
+  font-size: 11px;
+  color: #999;
+  font-family: monospace;
+}
+
+/* 범례 */
+.map-legend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  font-size: 13px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.legend-item:last-child {
+  margin-bottom: 0;
+}
+
+.legend-line {
+  width: 24px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.legend-safe {
+  background-color: #3182F6;
+}
+
+.legend-rain {
+  background-color: #ff4444;
+}
+
+/* Leaflet 팝업 커스터마이징 */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.leaflet-popup-content {
+  margin: 8px 12px;
+}
