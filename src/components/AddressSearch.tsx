@@ -71,32 +71,25 @@ export function AddressSearch({ onSelect, placeholder = '주소를 입력하세�
 
       {showResults && results.length > 0 && (
         <div className="search-results">
-          {results.map((result, index) => {
-            // 한국인지 확인
-            const isKorea = result.address?.country === 'South Korea' ||
-                           result.address?.country === '대한민국' ||
-                           result.display_name.includes('South Korea') ||
-                           result.display_name.includes('대한민국');
-
-            return (
-              <div
-                key={index}
-                className={`search-result-item ${!isKorea ? 'result-not-korea' : ''}`}
-                onClick={() => handleSelect(result)}
-              >
-                <div className="result-name">
-                  {isKorea ? '🇰🇷 ' : '⚠️ '}
-                  {result.display_name.split(',').slice(0, 3).join(', ')}
-                </div>
-                <div className="result-country">
-                  {result.address?.country || '국가 정보 없음'}
-                </div>
-                <div className="result-coords">
-                  {parseFloat(result.lat).toFixed(4)}, {parseFloat(result.lon).toFixed(4)}
-                </div>
+          {results.map((result, index) => (
+            <div
+              key={index}
+              className="search-result-item"
+              onClick={() => handleSelect(result)}
+            >
+              <div className="result-name">
+                {result.display_name}
               </div>
-            );
-          })}
+              {result.address?.road && (
+                <div className="result-road">
+                  {result.address.road}
+                </div>
+              )}
+              <div className="result-address">
+                {result.address?.city || ''}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

@@ -141,7 +141,7 @@ function App() {
   return (
     <div className="app">
       <div className="container">
-        <h1>🌧️ Rainism</h1>
+        <h1>Rainism</h1>
         <p className="subtitle">우산 결정 도우미</p>
 
         {/* 모드 전환 탭 */}
@@ -150,13 +150,13 @@ function App() {
             className={`mode-tab ${mode === 'current' ? 'active' : ''}`}
             onClick={() => setMode('current')}
           >
-            📍 현재 위치
+            현재 위치
           </button>
           <button
             className={`mode-tab ${mode === 'route' ? 'active' : ''}`}
             onClick={() => setMode('route')}
           >
-            🗺️ 경로별 예보
+            경로별 예보
           </button>
         </div>
           <form onSubmit={handleApiKeySubmit} className="api-key-form">
@@ -196,7 +196,7 @@ function App() {
   return (
     <div className="app">
       <div className="container">
-        <h1>🌧️ Rainism</h1>
+        <h1>Rainism</h1>
         <p className="subtitle">우산 결정 도우미</p>
 
         {/* 모드 전환 탭 */}
@@ -205,13 +205,13 @@ function App() {
             className={`mode-tab ${mode === 'current' ? 'active' : ''}`}
             onClick={() => setMode('current')}
           >
-            📍 현재 위치
+            현재 위치
           </button>
           <button
             className={`mode-tab ${mode === 'route' ? 'active' : ''}`}
             onClick={() => setMode('route')}
           >
-            🗺️ 경로별 예보
+            경로별 예보
           </button>
         </div>
 
@@ -219,7 +219,7 @@ function App() {
           <div className="loading">날씨 정보를 불러오는 중...</div>
         ) : error ? (
           <div className="error">
-            <p>❌ {error}</p>
+            <p>{error}</p>
             <button onClick={loadWeatherData} className="retry-button">
               다시 시도
             </button>
@@ -249,12 +249,12 @@ function App() {
             {/* 우산 결정 카드 - 핵심 UI */}
             {decision && (
               <div className={`decision-card decision-${decision.recommendation}`}>
-                <div className="decision-icon">{decision.icon}</div>
+                <div className="decision-icon"></div>
                 <div className="decision-content">
                   <div className="decision-title">
-                    {decision.recommendation === 'bring' && '☂️ 우산 챙기세요'}
-                    {decision.recommendation === 'optional' && '🤷‍♂️ 선택 영역'}
-                    {decision.recommendation === 'skip' && '😌 안 챙겨도 괜찮아요'}
+                    {decision.recommendation === 'bring' && '우산 챙기세요'}
+                    {decision.recommendation === 'optional' && '선택 영역'}
+                    {decision.recommendation === 'skip' && '안 챙겨도 괜찮아요'}
                   </div>
                   <div className="decision-score">우산 지수: {decision.score}점</div>
                   <div className="decision-message">{decision.message}</div>
@@ -264,17 +264,17 @@ function App() {
                     <div className="decision-details">
                       {decision.details.rainStartTime <= 20 && (
                         <div className="detail-item">
-                          ⏱️ {decision.details.rainStartTime}분 후 강수 시작
+                          {decision.details.rainStartTime}분 후 강수 시작
                         </div>
                       )}
                       {decision.details.rainDuration > 0 && (
                         <div className="detail-item">
-                          ⏳ 약 {decision.details.rainDuration}분간 지속 예상
+                          약 {decision.details.rainDuration}분간 지속 예상
                         </div>
                       )}
                       {decision.details.maxIntensity > 0 && (
                         <div className="detail-item">
-                          💧 최대 강수량 {decision.details.maxIntensity.toFixed(1)}mm
+                          최대 강수량 {decision.details.maxIntensity.toFixed(1)}mm
                         </div>
                       )}
                     </div>
@@ -286,7 +286,7 @@ function App() {
             {/* 행동 기준 설명 */}
             {decision && (
               <div className="action-explanation">
-                <div className="explanation-title">💡 판단 기준</div>
+                <div className="explanation-title">판단 기준</div>
                 <div className="explanation-content">
                   {decision.details.willGetWet ? (
                     <p>
@@ -316,7 +316,7 @@ function App() {
             )}
 
                 <button onClick={loadWeatherData} className="refresh-button">
-                  🔄 새로고침
+                  새로고침
                 </button>
               </>
             )}

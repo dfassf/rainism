@@ -167,7 +167,7 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
 
   return (
     <div className="route-planner">
-      <h2>📍 경로별 강수 예보</h2>
+      <h2>경로별 강수 예보</h2>
       <p className="route-subtitle">
         출발지, 경유지, 목적지를 입력하고 각 구간에서 비가 올 시각을 확인하세요
       </p>
@@ -178,7 +178,7 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
       {/* 초기 로딩 상태 */}
       {loadingLocation && points.length === 0 && (
         <div className="initial-loading">
-          <div className="loading-spinner">📍</div>
+          <div className="loading-spinner"></div>
           <p>현재 위치를 확인하는 중...</p>
           <p className="loading-hint">위치 권한을 허용해주세요</p>
         </div>
@@ -203,9 +203,9 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
           <div key={point.id} className="point-input-card">
             <div className="point-header">
               <span className={`point-type-badge point-type-${point.type}`}>
-                {point.type === 'start' && '🚩 출발지'}
-                {point.type === 'waypoint' && '📍 경유지'}
-                {point.type === 'destination' && '🎯 목적지'}
+                {point.type === 'start' && '출발지'}
+                {point.type === 'waypoint' && '경유지'}
+                {point.type === 'destination' && '목적지'}
               </span>
               {point.type === 'waypoint' && (
                 <button onClick={() => removeWaypoint(point.id)} className="remove-point-btn">
@@ -300,7 +300,7 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
       {/* 분석 버튼 */}
       {points.length >= 2 && (
         <button onClick={analyzeRoute} className="analyze-btn" disabled={loading}>
-          {loading ? '분석 중...' : '🔍 경로 분석하기'}
+          {loading ? '분석 중...' : '경로 분석하기'}
         </button>
       )}
 
@@ -321,20 +321,20 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
         )}
 
       {/* 오류 표시 */}
-      {error && <div className="route-error">❌ {error}</div>}
+      {error && <div className="route-error">{error}</div>}
 
       {/* 분석 결과 */}
       {analysis && (
         <div className="analysis-result">
           <div className={`overall-decision decision-${analysis.overallDecision.needsUmbrella ? 'bring' : 'skip'}`}>
             <div className="decision-icon">
-              {analysis.overallDecision.needsUmbrella ? '☂️' : '😌'}
+              {analysis.overallDecision.needsUmbrella ? '' : ''}
             </div>
             <div className="decision-content">
               <h3>
                 {analysis.overallDecision.needsUmbrella
-                  ? '☂️ 우산을 챙기세요'
-                  : '😌 우산 없이 이동 가능'}
+                  ? '우산을 챙기세요'
+                  : '우산 없이 이동 가능'}
               </h3>
               <p>{analysis.overallDecision.message}</p>
             </div>
@@ -355,7 +355,7 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
                 {segmentAnalysis.rainDuringTravel ? (
                   <div className="segment-rain-warning">
                     <div className="rain-times">
-                      ⚠️ <strong>비 예상 시각:</strong>{' '}
+                      <strong>비 예상 시각:</strong>{' '}
                       {segmentAnalysis.rainTimes.join(', ')}
                     </div>
                     <div className="rain-details">
@@ -374,7 +374,7 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
                     </div>
                   </div>
                 ) : (
-                  <div className="segment-no-rain">✅ 이동 중 강수 예보 없음</div>
+                  <div className="segment-no-rain">이동 중 강수 예보 없음</div>
                 )}
               </div>
             ))}
@@ -383,11 +383,11 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
           {/* 중요 지점 */}
           {analysis.overallDecision.criticalPoints.length > 0 && (
             <div className="critical-points">
-              <h3>⚠️ 주의할 지점</h3>
+              <h3>주의할 지점</h3>
               {analysis.overallDecision.criticalPoints.map((critical, index) => (
                 <div key={index} className="critical-point-card">
-                  <div className="critical-location">📍 {critical.point.name}</div>
-                  <div className="critical-time">⏰ {critical.rainTime}</div>
+                  <div className="critical-location">{critical.point.name}</div>
+                  <div className="critical-time">{critical.rainTime}</div>
                   <div className="critical-message">{critical.message}</div>
                 </div>
               ))}

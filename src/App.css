@@ -9,7 +9,7 @@ body {
     'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #D6EFFF;
+  background: #f0f0f0;
   min-height: 100vh;
 }
 
@@ -27,12 +27,12 @@ body {
   padding: 40px;
   max-width: 800px;
   width: 100%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
 }
 
 h1 {
   font-size: 2.5rem;
-  color: #333;
+  color: #111;
   text-align: center;
   margin-bottom: 10px;
 }
@@ -66,14 +66,14 @@ h1 {
 }
 
 .mode-tab:hover {
-  color: #3182F6;
-  background: #F2F8FF;
+  color: #333;
+  background: #f5f5f5;
 }
 
 .mode-tab.active {
-  color: #3182F6;
-  border-bottom-color: #3182F6;
-  background: #F2F8FF;
+  color: #111;
+  border-bottom-color: #111;
+  background: #f5f5f5;
 }
 
 .api-key-form {
@@ -98,14 +98,14 @@ h1 {
 
 .api-key-input:focus {
   outline: none;
-  border-color: #3182F6;
+  border-color: #333;
 }
 
 .submit-button,
 .refresh-button,
 .retry-button {
   padding: 12px 24px;
-  background: #3182F6;
+  background: #222;
   color: white;
   border: none;
   border-radius: 8px;
@@ -118,9 +118,9 @@ h1 {
 .submit-button:hover,
 .refresh-button:hover,
 .retry-button:hover {
-  background: #1B64DA;
+  background: #000;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(49, 130, 246, 0.4);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .submit-button:active,
@@ -147,16 +147,16 @@ h1 {
 }
 
 .info-box a {
-  color: #3182F6;
-  text-decoration: none;
-}
-
-.info-box a:hover {
+  color: #333;
   text-decoration: underline;
 }
 
+.info-box a:hover {
+  color: #000;
+}
+
 .location-info {
-  background: #e3f2fd;
+  background: #f5f5f5;
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 20px;
@@ -164,7 +164,7 @@ h1 {
 }
 
 .location-info p {
-  color: #1976d2;
+  color: #333;
   font-weight: 500;
 }
 
@@ -197,7 +197,7 @@ h1 {
 
 .travel-time-select:focus {
   outline: none;
-  border-color: #3182F6;
+  border-color: #333;
 }
 
 /* 우산 결정 카드 - 핵심 UI */
@@ -206,28 +206,28 @@ h1 {
   border-radius: 16px;
   padding: 30px;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .decision-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
 }
 
 .decision-card.decision-bring {
-  background: #fff3e0;
-  border: 3px solid #ff9800;
+  background: #f5f5f5;
+  border: 3px solid #333;
 }
 
 .decision-card.decision-optional {
-  background: #E5F3FF;
-  border: 3px solid #3182F6;
+  background: #fafafa;
+  border: 3px solid #999;
 }
 
 .decision-card.decision-skip {
-  background: #e8f5e9;
-  border: 3px solid #4caf50;
+  background: #fafafa;
+  border: 3px solid #ccc;
 }
 
 .decision-icon {
@@ -239,19 +239,19 @@ h1 {
   font-size: 1.8rem;
   font-weight: 700;
   margin-bottom: 10px;
-  color: #333;
+  color: #111;
 }
 
 .decision-card.decision-bring .decision-title {
-  color: #e65100;
+  color: #111;
 }
 
 .decision-card.decision-optional .decision-title {
-  color: #1565c0;
+  color: #444;
 }
 
 .decision-card.decision-skip .decision-title {
-  color: #2e7d32;
+  color: #666;
 }
 
 .decision-score {
@@ -284,11 +284,11 @@ h1 {
 
 /* 행동 기준 설명 */
 .action-explanation {
-  background: #F2F8FF;
+  background: #f5f5f5;
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 20px;
-  border-left: 4px solid #3182F6;
+  border-left: 4px solid #333;
 }
 
 .explanation-title {
@@ -321,7 +321,7 @@ h1 {
 .error {
   text-align: center;
   padding: 40px;
-  color: #d32f2f;
+  color: #333;
 }
 
 .error p {
@@ -348,7 +348,7 @@ h1 {
 }
 
 .forecast-card {
-  background: #F2F8FF;
+  background: #f5f5f5;
   padding: 20px;
   border-radius: 12px;
   text-align: center;
@@ -357,7 +357,7 @@ h1 {
 
 .forecast-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .forecast-time {
@@ -370,7 +370,7 @@ h1 {
 .forecast-precipitation {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1976d2;
+  color: #333;
   margin-bottom: 8px;
   display: flex;
   align-items: center;
@@ -383,7 +383,7 @@ h1 {
 }
 
 .no-rain {
-  color: #4caf50;
+  color: #999;
 }
 
 .forecast-type {
@@ -392,14 +392,14 @@ h1 {
 }
 
 .forecast-card.needs-umbrella {
-  border: 2px solid #ff9800;
-  background: #fff3e0;
+  border: 2px solid #333;
+  background: #f0f0f0;
 }
 
 .umbrella-badge {
   margin-top: 8px;
   font-size: 0.85rem;
-  color: #f57c00;
+  color: #333;
   font-weight: 600;
 }
 
@@ -408,21 +408,11 @@ h1 {
   display: flex;
   align-items: center;
   gap: 15px;
-  background: #fff3e0;
-  border: 2px solid #ff9800;
+  background: #f5f5f5;
+  border: 2px solid #333;
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 20px;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 10px rgba(255, 152, 0, 0);
-  }
 }
 
 .umbrella-icon {
@@ -432,13 +422,13 @@ h1 {
 
 .umbrella-content h3 {
   margin: 0 0 5px 0;
-  color: #e65100;
+  color: #111;
   font-size: 1.2rem;
 }
 
 .umbrella-content p {
   margin: 0;
-  color: #bf360c;
+  color: #555;
   font-size: 0.95rem;
 }
 
@@ -468,7 +458,7 @@ h1 {
   display: block;
   font-size: 1.3rem;
   font-weight: 700;
-  color: #1976d2;
+  color: #111;
 }
 
 /* 강수량 차트 */
@@ -502,19 +492,19 @@ h1 {
 }
 
 .chart-bar.no-rain {
-  background: #c8e6c9;
+  background: #e0e0e0;
 }
 
 .chart-bar.light-rain {
-  background: #81d4fa;
+  background: #bbb;
 }
 
 .chart-bar.moderate-rain {
-  background: #42a5f5;
+  background: #888;
 }
 
 .chart-bar.heavy-rain {
-  background: #1976d2;
+  background: #444;
 }
 
 .chart-bar:hover {
@@ -531,19 +521,19 @@ h1 {
 
 /* 강수량 색상 클래스 */
 .forecast-precipitation.no-rain {
-  color: #4caf50;
+  color: #999;
 }
 
 .forecast-precipitation.light-rain {
-  color: #03a9f4;
+  color: #777;
 }
 
 .forecast-precipitation.moderate-rain {
-  color: #2196f3;
+  color: #555;
 }
 
 .forecast-precipitation.heavy-rain {
-  color: #1976d2;
+  color: #222;
 }
 
 .no-data {

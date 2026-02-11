@@ -1,7 +1,21 @@
 /**
- * OSM Nominatim API를 사용한 주소 검색 서비스
- * 무료이며 승인 불필요
+ * 카카오맵 API를 사용한 주소 검색 서비스
  */
+
+/** kakao.maps.load()를 한 번만 호출하고 결과를 캐싱 */
+let kakaoLoadPromise: Promise<void> | null = null;
+
+export function ensureKakaoLoaded(): Promise<void> {
+  if (kakaoLoadPromise) return kakaoLoadPromise;
+  kakaoLoadPromise = new Promise((resolve, reject) => {
+    if (typeof kakao === 'undefined') {
+      reject(new Error('카카오맵 SDK가 로드되지 않았습니다. VITE_KAKAO_MAP_API_KEY를 확인해주세요.'));
+      return;
+    }
+    kakao.maps.load(() => resolve());
+  });
+  return kakaoLoadPromise;
+}
 
 export interface GeocodingResult {
   display_name: string;
@@ -17,74 +31,90 @@ export interface GeocodingResult {
 }
 
 export class GeocodingService {
-  private baseUrl = 'https://nominatim.openstreetmap.org';
+  private places: kakao.maps.services.Places | null = null;
+  private geocoder: kakao.maps.services.Geocoder | null = null;
+
+  private getPlaces(): kakao.maps.services.Places {
+    if (!this.places) {
+      this.places = new kakao.maps.services.Places();
+    }
+    return this.places;
+  }
+
+  private getGeocoder(): kakao.maps.services.Geocoder {
+    if (!this.geocoder) {
+      this.geocoder = new kakao.maps.services.Geocoder();
+    }
+    return this.geocoder;
+  }
 
   /**
-   * 주소로 좌표 검색 (Geocoding)
+   * 키워드로 장소 검색 (카카오 Places)
    */
   async searchAddress(query: string): Promise<GeocodingResult[]> {
     if (!query || query.trim().length === 0) {
       return [];
     }
 
-    try {
-      const response = await fetch(
-        `${this.baseUrl}/search?` +
-          new URLSearchParams({
-            q: query,
-            format: 'json',
-            addressdetails: '1',
-            limit: '5',
-            countrycodes: 'kr', // 한국 결과만
-          }),
-        {
-          headers: {
-            'User-Agent': 'Rainism/1.0', // Nominatim 정책: User-Agent 필수
-          },
-        }
+    await ensureKakaoLoaded();
+
+    return new Promise((resolve, reject) => {
+      this.getPlaces().keywordSearch(
+        query,
+        (result, status) => {
+          if (status === kakao.maps.services.Status.OK) {
+            const mapped: GeocodingResult[] = result.map((item) => ({
+              display_name: item.place_name,
+              lat: item.y,
+              lon: item.x,
+              address: {
+                road: item.road_address_name || undefined,
+                city: item.address_name || undefined,
+                country: '대한민국',
+              },
+            }));
+            resolve(mapped);
+          } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+            resolve([]);
+          } else {
+            reject(new Error('주소 검색 중 오류가 발생했습니다.'));
+          }
+        },
+        { size: 5 }
       );
-
-      if (!response.ok) {
-        throw new Error('주소 검색에 실패했습니다.');
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Geocoding error:', error);
-      throw new Error('주소 검색 중 오류가 발생했습니다.');
-    }
+    });
   }
 
   /**
-   * 좌표로 주소 검색 (Reverse Geocoding)
+   * 좌표로 주소 검색 (카카오 Geocoder)
    */
   async reverseGeocode(lat: number, lon: number): Promise<GeocodingResult | null> {
-    try {
-      const response = await fetch(
-        `${this.baseUrl}/reverse?` +
-          new URLSearchParams({
-            lat: lat.toString(),
-            lon: lon.toString(),
-            format: 'json',
-            addressdetails: '1',
-          }),
-        {
-          headers: {
-            'User-Agent': 'Rainism/1.0',
-          },
+    await ensureKakaoLoaded();
+
+    return new Promise((resolve) => {
+      this.getGeocoder().coord2Address(
+        lon,
+        lat,
+        (result, status) => {
+          if (status === kakao.maps.services.Status.OK && result.length > 0) {
+            const item = result[0];
+            const addressName =
+              item.road_address?.address_name || item.address.address_name;
+            resolve({
+              display_name: addressName,
+              lat: lat.toString(),
+              lon: lon.toString(),
+              address: {
+                city: item.address.region_2depth_name,
+                state: item.address.region_1depth_name,
+                country: '대한민국',
+              },
+            });
+          } else {
+            resolve(null);
+          }
         }
       );
-
-      if (!response.ok) {
-        throw new Error('역지오코딩에 실패했습니다.');
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Reverse geocoding error:', error);
-      return null;
-    }
+    });
   }
 }
