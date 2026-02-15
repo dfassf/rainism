@@ -13,7 +13,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string>('');
-  const [travelTime, setTravelTime] = useState<number>(30); // 기본 이동 시간 30분
+  const [travelTime] = useState<number>(120); // 2시간 예보 전체 활용
   const [mode, setMode] = useState<'current' | 'route'>('current'); // 현재 위치 / 경로 모드
 
   useEffect(() => {
@@ -150,13 +150,13 @@ function App() {
             className={`mode-tab ${mode === 'current' ? 'active' : ''}`}
             onClick={() => setMode('current')}
           >
-            현재 위치
+            동네 외출
           </button>
           <button
             className={`mode-tab ${mode === 'route' ? 'active' : ''}`}
             onClick={() => setMode('route')}
           >
-            경로별 예보
+            장거리 외출
           </button>
         </div>
           <form onSubmit={handleApiKeySubmit} className="api-key-form">
@@ -205,13 +205,13 @@ function App() {
             className={`mode-tab ${mode === 'current' ? 'active' : ''}`}
             onClick={() => setMode('current')}
           >
-            현재 위치
+            동네 외출
           </button>
           <button
             className={`mode-tab ${mode === 'route' ? 'active' : ''}`}
             onClick={() => setMode('route')}
           >
-            경로별 예보
+            장거리 외출
           </button>
         </div>
 
@@ -230,46 +230,27 @@ function App() {
               <RoutePlanner apiKey={apiKey} />
             ) : (
               <>
-                {/* 이동 시간 설정 */}
-                <div className="travel-time-setting">
-                  <label htmlFor="travelTime">예상 이동 시간:</label>
-                  <select
-                    id="travelTime"
-                    value={travelTime}
-                    onChange={(e) => setTravelTime(Number(e.target.value))}
-                    className="travel-time-select"
-                  >
-                    <option value={15}>15분</option>
-                    <option value={30}>30분</option>
-                    <option value={45}>45분</option>
-                    <option value={60}>60분</option>
-                  </select>
-                </div>
-
             {/* 우산 결정 카드 - 핵심 UI */}
             {decision && (
               <div className={`decision-card decision-${decision.recommendation}`}>
-                <div className="decision-icon"></div>
+                <div className="decision-icon">
+                  {decision.recommendation === 'bring' && '☂️'}
+                  {decision.recommendation === 'maybe' && '🌂'}
+                  {decision.recommendation === 'skip' && '☀️'}
+                </div>
                 <div className="decision-content">
-                  <div className="decision-title">
-                    {decision.recommendation === 'bring' && '우산 챙기세요'}
-                    {decision.recommendation === 'optional' && '선택 영역'}
-                    {decision.recommendation === 'skip' && '안 챙겨도 괜찮아요'}
-                  </div>
-                  <div className="decision-score">우산 지수: {decision.score}점</div>
                   <div className="decision-message">{decision.message}</div>
-                  
-                  {/* 상세 정보 (접을 수 있게) */}
+
                   {decision.details.rainStartTime !== null && (
                     <div className="decision-details">
-                      {decision.details.rainStartTime <= 20 && (
+                      {decision.details.rainStartTime > 0 && (
                         <div className="detail-item">
-                          {decision.details.rainStartTime}분 후 강수 시작
+                          {decision.details.rainStartTime}분 뒤에 비 시작
                         </div>
                       )}
                       {decision.details.rainDuration > 0 && (
                         <div className="detail-item">
-                          약 {decision.details.rainDuration}분간 지속 예상
+                          약 {decision.details.rainDuration}분 동안 비 예상
                         </div>
                       )}
                       {decision.details.maxIntensity > 0 && (
@@ -286,26 +267,13 @@ function App() {
             {/* 행동 기준 설명 */}
             {decision && (
               <div className="action-explanation">
-                <div className="explanation-title">판단 기준</div>
                 <div className="explanation-content">
                   {decision.details.willGetWet ? (
-                    <p>
-                      <strong>안 들고 나가면 맞을 가능성:</strong> 높음
-                      <br />
-                      우산을 챙기지 않으면 이동 중 비를 맞을 확률이 높습니다.
-                    </p>
+                    <p>안 들고 나가면 비 맞을 가능성이 높아요</p>
                   ) : decision.details.isWasteful ? (
-                    <p>
-                      <strong>들고 가면 헛수고일 확률:</strong> 높음
-                      <br />
-                      강수 가능성이 낮아 우산을 들고 가도 사용하지 않을 가능성이 큽니다.
-                    </p>
+                    <p>들고 가면 헛수고일 수 있어요</p>
                   ) : (
-                    <p>
-                      <strong>안전 구간</strong>
-                      <br />
-                      이동 시간 동안 강수 예보가 없습니다.
-                    </p>
+                    <p>당분간 비 소식 없어요</p>
                   )}
                 </div>
               </div>

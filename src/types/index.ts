@@ -24,7 +24,7 @@ export interface RainfallSummary {
 
 export interface UmbrellaDecision {
   score: number; // 0~100 우산 지수
-  recommendation: 'bring' | 'optional' | 'skip';
+  recommendation: 'bring' | 'maybe' | 'skip';
   message: string;
   icon: string;
   details: {

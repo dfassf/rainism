@@ -8,7 +8,18 @@ declare namespace kakao.maps {
     setBounds(bounds: LatLngBounds, paddingTop?: number, paddingRight?: number, paddingBottom?: number, paddingLeft?: number): void;
     getCenter(): LatLng;
     getLevel(): number;
+    getProjection(): MapProjection;
     relayout(): void;
+  }
+
+  interface Point {
+    x: number;
+    y: number;
+  }
+
+  interface MapProjection {
+    containerPointFromCoords(latlng: LatLng): Point;
+    coordsFromContainerPoint(point: Point): LatLng;
   }
 
   interface MapOptions {
@@ -76,6 +87,14 @@ declare namespace kakao.maps {
     map?: Map;
     yAnchor?: number;
     xAnchor?: number;
+  }
+
+  namespace event {
+    interface MouseEvent {
+      latLng: LatLng;
+    }
+    function addListener(target: object, type: string, callback: (event: MouseEvent) => void): void;
+    function removeListener(target: object, type: string, callback: (event: MouseEvent) => void): void;
   }
 
   namespace services {

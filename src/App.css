@@ -220,7 +220,7 @@ h1 {
   border: 3px solid #333;
 }
 
-.decision-card.decision-optional {
+.decision-card.decision-maybe {
   background: #fafafa;
   border: 3px solid #999;
 }
@@ -231,7 +231,7 @@ h1 {
 }
 
 .decision-icon {
-  font-size: 4rem;
+  font-size: 6rem;
   margin-bottom: 15px;
 }
 
@@ -246,7 +246,7 @@ h1 {
   color: #111;
 }
 
-.decision-card.decision-optional .decision-title {
+.decision-card.decision-maybe .decision-title {
   color: #444;
 }
 

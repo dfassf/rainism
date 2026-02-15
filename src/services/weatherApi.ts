@@ -35,6 +35,10 @@ export interface UltraShortRainfallResponse {
 /**
  * 기상청 초단기강수예측 API 서비스
  */
+// 캐시 (격자+baseTime 기준, 10분 TTL)
+const cache = new Map<string, { data: UltraShortRainfallItem[]; timestamp: number }>();
+const CACHE_TTL = 10 * 60 * 1000; // 10분
+
 export class WeatherApiService {
   private readonly baseUrl = 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst';
   private readonly serviceKey: string;
@@ -54,6 +58,13 @@ export class WeatherApiService {
     const now = new Date();
     const baseDate = this.formatDate(now);
     const baseTime = this.getBaseTime(now);
+    const cacheKey = `${nx}:${ny}:${baseDate}:${baseTime}`;
+
+    // 캐시 확인
+    const cached = cache.get(cacheKey);
+    if (cached && now.getTime() - cached.timestamp < CACHE_TTL) {
+      return cached.data;
+    }
 
     try {
       const response = await axios.get<UltraShortRainfallResponse>(this.baseUrl, {
@@ -75,7 +86,19 @@ export class WeatherApiService {
         );
       }
 
-      return response.data.response.body.items.item || [];
+      const items = response.data.response.body.items.item || [];
+
+      // 캐시 저장
+      cache.set(cacheKey, { data: items, timestamp: now.getTime() });
+
+      // 오래된 캐시 정리
+      for (const [key, entry] of cache) {
+        if (now.getTime() - entry.timestamp >= CACHE_TTL) {
+          cache.delete(key);
+        }
+      }
+
+      return items;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(`API 요청 실패: ${error.message}`);

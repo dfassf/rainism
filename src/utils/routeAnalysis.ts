@@ -1,6 +1,7 @@
 import { RoutePoint, RouteSegment, PointRainfallForecast, RouteRainfallAnalysis } from '../types/route';
 import { convertToGridCoordinates } from './gridConverter';
 import { WeatherApiService } from '../services/weatherApi';
+import { formatRelativeTime } from './timeFormat';
 
 /**
  * 경로 기반 강수 예보 분석 유틸리티
@@ -136,7 +137,7 @@ export async function analyzeRouteRainfall(
         criticalPoints.push({
           point: analysis.segment.from,
           rainTime,
-          message: `${analysis.segment.from.name} → ${analysis.segment.to.name} 구간에서 ${rainTime}에 비 예상`,
+          message: `${analysis.segment.from.name} → ${analysis.segment.to.name} 구간, ${formatRelativeTime(rainTime)} 비 예상`,
         });
       });
     }
@@ -147,9 +148,9 @@ export async function analyzeRouteRainfall(
   
   if (needsUmbrella) {
     const firstCritical = criticalPoints[0];
-    message = `${firstCritical.point.name}에서 ${firstCritical.rainTime}에 비가 올 예정입니다. 우산을 챙기세요.`;
+    message = `${firstCritical.point.name} 근처에서 ${formatRelativeTime(firstCritical.rainTime)} 비가 와요`;
   } else {
-    message = '경로상 강수 예보가 없습니다. 우산 없이 이동 가능합니다.';
+    message = '경로상 비 소식 없어요';
   }
 
   return {

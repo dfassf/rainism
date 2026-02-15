@@ -1,42 +1,60 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { RoutePoint } from '../types/route';
 import { ensureKakaoLoaded } from '../services/geocoding';
 import './RouteMap.css';
 
-interface RouteMapProps {
-  points: RoutePoint[];
-  rainSegments?: number[]; // 비가 오는 구간의 인덱스 배열
-  height?: string;
+interface ContextMenuState {
+  visible: boolean;
+  x: number;
+  y: number;
+  lat: number;
+  lng: number;
 }
 
-export function RouteMap({ points, rainSegments = [], height = '400px' }: RouteMapProps) {
+interface RouteMapProps {
+  points: RoutePoint[];
+  rainSegments?: number[];
+  height?: string;
+  onSetPoint?: (type: 'start' | 'destination' | 'waypoint', lat: number, lng: number) => void;
+}
+
+export function RouteMap({ points, rainSegments = [], height = '400px', onSetPoint }: RouteMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<kakao.maps.Map | null>(null);
   const markersRef = useRef<kakao.maps.Marker[]>([]);
   const polylinesRef = useRef<kakao.maps.Polyline[]>([]);
   const overlaysRef = useRef<kakao.maps.CustomOverlay[]>([]);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>({
+    visible: false, x: 0, y: 0, lat: 0, lng: 0,
+  });
+
+  const closeContextMenu = useCallback(() => {
+    setContextMenu((prev) => ({ ...prev, visible: false }));
+  }, []);
 
   // 지도 초기화
   useEffect(() => {
-    if (!mapRef.current || points.length === 0) return;
+    if (!mapRef.current) return;
 
     const initMap = () => {
       const validPoints = points.filter((p) => p.latitude !== 0 && p.longitude !== 0);
-      if (validPoints.length === 0) return;
 
-      const center = new kakao.maps.LatLng(validPoints[0].latitude, validPoints[0].longitude);
+      const defaultCenter = validPoints.length > 0
+        ? new kakao.maps.LatLng(validPoints[0].latitude, validPoints[0].longitude)
+        : new kakao.maps.LatLng(37.5665, 126.978);
+
       const options: kakao.maps.MapOptions = {
-        center,
-        level: validPoints.length === 1 ? 3 : 5,
+        center: defaultCenter,
+        level: validPoints.length <= 1 ? 5 : 7,
       };
 
       if (!mapInstanceRef.current) {
         mapInstanceRef.current = new kakao.maps.Map(mapRef.current!, options);
-      } else {
-        mapInstanceRef.current.setCenter(center);
       }
 
-      updateMapContent(validPoints);
+      if (validPoints.length > 0) {
+        updateMapContent(validPoints);
+      }
     };
 
     if (mapInstanceRef.current) {
@@ -46,11 +64,48 @@ export function RouteMap({ points, rainSegments = [], height = '400px' }: RouteM
     }
   }, [points, rainSegments]);
 
+  // 우클릭 이벤트
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    const handleRightClick = (mouseEvent: kakao.maps.event.MouseEvent) => {
+      const latlng = mouseEvent.latLng;
+      const projection = map.getProjection();
+      const point = projection.containerPointFromCoords(latlng);
+      setContextMenu({
+        visible: true,
+        x: point.x,
+        y: point.y,
+        lat: latlng.getLat(),
+        lng: latlng.getLng(),
+      });
+    };
+
+    const handleClick = () => {
+      closeContextMenu();
+    };
+
+    kakao.maps.event.addListener(map, 'rightclick', handleRightClick);
+    kakao.maps.event.addListener(map, 'click', handleClick);
+
+    return () => {
+      kakao.maps.event.removeListener(map, 'rightclick', handleRightClick);
+      kakao.maps.event.removeListener(map, 'click', handleClick);
+    };
+  }, [closeContextMenu]);
+
+  const handleContextSelect = (type: 'start' | 'destination' | 'waypoint') => {
+    if (onSetPoint) {
+      onSetPoint(type, contextMenu.lat, contextMenu.lng);
+    }
+    closeContextMenu();
+  };
+
   const updateMapContent = (validPoints: RoutePoint[]) => {
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    // 기존 마커, 폴리라인, 오버레이 제거
     markersRef.current.forEach((m) => m.setMap(null));
     polylinesRef.current.forEach((p) => p.setMap(null));
     overlaysRef.current.forEach((o) => o.setMap(null));
@@ -58,7 +113,6 @@ export function RouteMap({ points, rainSegments = [], height = '400px' }: RouteM
     polylinesRef.current = [];
     overlaysRef.current = [];
 
-    // 마커 + 커스텀 오버레이 추가
     validPoints.forEach((point) => {
       const position = new kakao.maps.LatLng(point.latitude, point.longitude);
 
@@ -85,7 +139,6 @@ export function RouteMap({ points, rainSegments = [], height = '400px' }: RouteM
       overlaysRef.current.push(overlay);
     });
 
-    // 경로선 그리기
     if (validPoints.length > 1) {
       for (let i = 0; i < validPoints.length - 1; i++) {
         const from = validPoints[i];
@@ -98,8 +151,8 @@ export function RouteMap({ points, rainSegments = [], height = '400px' }: RouteM
             new kakao.maps.LatLng(to.latitude, to.longitude),
           ],
           strokeWeight: isRain ? 6 : 4,
-          strokeColor: isRain ? '#333333' : '#999999',
-          strokeOpacity: 0.7,
+          strokeColor: isRain ? '#111111' : '#aaaaaa',
+          strokeOpacity: isRain ? 0.9 : 0.6,
           strokeStyle: 'solid',
           map,
         });
@@ -107,7 +160,6 @@ export function RouteMap({ points, rainSegments = [], height = '400px' }: RouteM
       }
     }
 
-    // 지도 범위 조정
     if (validPoints.length === 1) {
       map.setCenter(new kakao.maps.LatLng(validPoints[0].latitude, validPoints[0].longitude));
       map.setLevel(3);
@@ -131,6 +183,18 @@ export function RouteMap({ points, rainSegments = [], height = '400px' }: RouteM
   return (
     <div className="route-map-container" style={{ height }}>
       <div ref={mapRef} style={{ height: '100%', width: '100%' }} />
+
+      {/* 우클릭 컨텍스트 메뉴 */}
+      {contextMenu.visible && (
+        <div
+          className="map-context-menu"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+        >
+          <button onClick={() => handleContextSelect('start')}>출발지로 설정</button>
+          <button onClick={() => handleContextSelect('destination')}>도착지로 설정</button>
+          <button onClick={() => handleContextSelect('waypoint')}>경유지 추가</button>
+        </div>
+      )}
 
       {/* 범례 */}
       <div className="map-legend">

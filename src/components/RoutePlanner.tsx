@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { RoutePoint, RouteSegment, RouteRainfallAnalysis } from '../types/route';
 import { analyzeRouteRainfall } from '../utils/routeAnalysis';
-import { AddressSearch } from './AddressSearch';
+import { PointInputCard } from './PointInputCard';
 import { RouteMap } from './RouteMap';
 import { getCurrentLocation } from '../utils/location';
 import { GeocodingService } from '../services/geocoding';
+import { formatRelativeTime } from '../utils/timeFormat';
 import './RoutePlanner.css';
 
 interface RoutePlannerProps {
@@ -17,7 +18,6 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
   const [analysis, setAnalysis] = useState<RouteRainfallAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showCoordinates, setShowCoordinates] = useState(false);
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [initialized, setInitialized] = useState(false);
 
@@ -63,7 +63,6 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
       console.error('현재 위치 가져오기 실패:', err);
       setError('현재 위치를 가져올 수 없습니다. 위치 권한을 확인해주세요.');
 
-      // 실패해도 빈 출발지와 목적지는 생성
       const startPoint: RoutePoint = {
         id: `point-start-${Date.now()}`,
         name: '',
@@ -96,10 +95,9 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
       latitude: 0,
       longitude: 0,
       type: 'waypoint',
-      order: points.length - 1, // 목적지 바로 앞에 삽입
+      order: points.length - 1,
     };
 
-    // 목적지를 제외한 모든 지점 + 새 경유지 + 목적지 순서로 재구성
     const destination = points[points.length - 1];
     const otherPoints = points.slice(0, -1);
     const updatedPoints = [...otherPoints, newWaypoint, destination].map((p, idx) => ({
@@ -112,7 +110,7 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
 
   // 지점 업데이트
   const updatePoint = (id: string, updates: Partial<RoutePoint>) => {
-    setPoints(points.map((p) => (p.id === id ? { ...p, ...updates } : p)));
+    setPoints((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
   };
 
   // 경유지 삭제 (출발지와 목적지는 삭제 불가)
@@ -126,48 +124,85 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
     setPoints(updatedPoints);
   };
 
-  // 경로 분석 실행
-  const analyzeRoute = async () => {
-    if (points.length < 2) {
-      setError('출발지와 목적지가 필요합니다.');
-      return;
+  // 지도 우클릭으로 위치 설정
+  const handleSetPoint = async (type: 'start' | 'destination' | 'waypoint', lat: number, lng: number) => {
+    let addressName = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    try {
+      const geocodingService = new GeocodingService();
+      const address = await geocodingService.reverseGeocode(lat, lng);
+      if (address?.display_name) {
+        addressName = address.display_name;
+      }
+    } catch {
+      // 역지오코딩 실패 시 좌표 기반 이름 사용
     }
 
-    // 모든 지점에 이름과 좌표가 있는지 확인
+    if (type === 'waypoint') {
+      // 경유지 추가
+      const newWaypoint: RoutePoint = {
+        id: `point-waypoint-${Date.now()}`,
+        name: addressName,
+        latitude: lat,
+        longitude: lng,
+        type: 'waypoint',
+        order: points.length - 1,
+      };
+      const destination = points[points.length - 1];
+      const otherPoints = points.slice(0, -1);
+      setPoints([...otherPoints, newWaypoint, destination].map((p, idx) => ({
+        ...p,
+        order: idx,
+      })));
+    } else {
+      // 출발지 또는 도착지 업데이트
+      const target = points.find((p) => p.type === type);
+      if (target) {
+        updatePoint(target.id, { name: addressName, latitude: lat, longitude: lng });
+      }
+    }
+  };
+
+  // 모든 지점이 유효하면 자동 분석
+  useEffect(() => {
+    if (points.length < 2) return;
+
     const invalidPoints = points.filter(
       (p) => !p.name || p.latitude === 0 || p.longitude === 0
     );
     if (invalidPoints.length > 0) {
-      setError('모든 지점의 이름과 좌표를 입력해주세요.');
+      setAnalysis(null);
       return;
     }
 
-    // 구간 생성
-    const newSegments: RouteSegment[] = [];
-    for (let i = 0; i < points.length - 1; i++) {
-      newSegments.push({
-        from: points[i],
-        to: points[i + 1],
-        estimatedTime: 30, // 기본 30분 (나중에 카카오맵 API로 계산)
-      });
-    }
-    setSegments(newSegments);
+    const runAnalysis = async () => {
+      const newSegments: RouteSegment[] = [];
+      for (let i = 0; i < points.length - 1; i++) {
+        newSegments.push({
+          from: points[i],
+          to: points[i + 1],
+          estimatedTime: 60,
+        });
+      }
+      setSegments(newSegments);
 
-    try {
-      setLoading(true);
-      setError(null);
-      const result = await analyzeRouteRainfall(points, newSegments, apiKey);
-      setAnalysis(result);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '경로 분석 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        setLoading(true);
+        setError(null);
+        const result = await analyzeRouteRainfall(points, newSegments, apiKey);
+        setAnalysis(result);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '경로 분석 중 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    runAnalysis();
+  }, [points, apiKey]);
 
   return (
     <div className="route-planner">
-      <h2>경로별 강수 예보</h2>
+      <h2>장거리 외출</h2>
       <p className="route-subtitle">
         출발지, 경유지, 목적지를 입력하고 각 구간에서 비가 올 시각을 확인하세요
       </p>
@@ -182,6 +217,25 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
           <p>현재 위치를 확인하는 중...</p>
           <p className="loading-hint">위치 권한을 허용해주세요</p>
         </div>
+      )}
+
+      {/* 지도 표시 - 항상 표시, 우클릭으로 위치 선택 */}
+      {points.length > 0 && (
+        <>
+          <RouteMap
+            points={points}
+            onSetPoint={handleSetPoint}
+            rainSegments={
+              analysis
+                ? analysis.segments
+                    .map((seg, idx) => (seg.rainDuringTravel ? idx : -1))
+                    .filter((idx) => idx !== -1)
+                : []
+            }
+            height="450px"
+          />
+          <p className="map-hint">지도를 우클릭하여 출발지/도착지/경유지를 설정할 수 있습니다</p>
+        </>
       )}
 
       {/* 지점 입력 */}
@@ -200,125 +254,19 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
         </div>
 
         {points.map((point) => (
-          <div key={point.id} className="point-input-card">
-            <div className="point-header">
-              <span className={`point-type-badge point-type-${point.type}`}>
-                {point.type === 'start' && '출발지'}
-                {point.type === 'waypoint' && '경유지'}
-                {point.type === 'destination' && '목적지'}
-              </span>
-              {point.type === 'waypoint' && (
-                <button onClick={() => removeWaypoint(point.id)} className="remove-point-btn">
-                  삭제
-                </button>
-              )}
-            </div>
-
-            {/* 주소 검색 */}
-            <div className="point-inputs">
-              {point.name && point.latitude && point.longitude ? (
-                <div className="selected-location">
-                  <div className="selected-name">{point.name}</div>
-                  <div className="selected-coords">
-                    {point.latitude.toFixed(6)}, {point.longitude.toFixed(6)}
-                  </div>
-                  <button
-                    onClick={() => updatePoint(point.id, { name: '', latitude: 0, longitude: 0 })}
-                    className="change-location-btn"
-                  >
-                    변경
-                  </button>
-                </div>
-              ) : (
-                <AddressSearch
-                  placeholder={`${
-                    point.type === 'start'
-                      ? '출발지'
-                      : point.type === 'destination'
-                      ? '목적지'
-                      : '경유지'
-                  } 주소를 입력하세요 (예: 강남역)`}
-                  onSelect={(result) => {
-                    updatePoint(point.id, {
-                      name: result.name,
-                      latitude: result.latitude,
-                      longitude: result.longitude,
-                    });
-                  }}
-                />
-              )}
-            </div>
-
-            {/* 좌표 직접 입력 (고급 옵션) */}
-            {!point.name && (
-              <div className="advanced-options">
-                <button
-                  onClick={() => setShowCoordinates(!showCoordinates)}
-                  className="toggle-coords-btn"
-                >
-                  {showCoordinates ? '좌표 입력 숨기기' : '좌표로 직접 입력'}
-                </button>
-                {showCoordinates && (
-                  <div className="coordinate-inputs">
-                    <input
-                      type="number"
-                      placeholder="위도"
-                      step="0.0001"
-                      value={point.latitude || ''}
-                      onChange={(e) =>
-                        updatePoint(point.id, { latitude: parseFloat(e.target.value) || 0 })
-                      }
-                      className="coordinate-input"
-                    />
-                    <input
-                      type="number"
-                      placeholder="경도"
-                      step="0.0001"
-                      value={point.longitude || ''}
-                      onChange={(e) =>
-                        updatePoint(point.id, { longitude: parseFloat(e.target.value) || 0 })
-                      }
-                      className="coordinate-input"
-                    />
-                    {point.latitude !== 0 && point.longitude !== 0 && (
-                      <input
-                        type="text"
-                        placeholder="지점 이름 (선택)"
-                        value={point.name}
-                        onChange={(e) => updatePoint(point.id, { name: e.target.value })}
-                        className="point-name-input"
-                      />
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          <PointInputCard
+            key={point.id}
+            point={point}
+            onUpdate={updatePoint}
+            onRemove={point.type === 'waypoint' ? removeWaypoint : undefined}
+          />
         ))}
       </div>
 
-      {/* 분석 버튼 */}
-      {points.length >= 2 && (
-        <button onClick={analyzeRoute} className="analyze-btn" disabled={loading}>
-          {loading ? '분석 중...' : '경로 분석하기'}
-        </button>
+      {/* 분석 중 표시 */}
+      {loading && (
+        <div className="analyze-loading">분석 중...</div>
       )}
-
-      {/* 지도 표시 - 모든 지점이 유효한 좌표를 가지고 있을 때만 */}
-      {points.length >= 2 &&
-        points.every((p) => p.latitude !== 0 && p.longitude !== 0) && (
-          <RouteMap
-            points={points}
-            rainSegments={
-              analysis
-                ? analysis.segments
-                    .map((seg, idx) => (seg.rainDuringTravel ? idx : -1))
-                    .filter((idx) => idx !== -1)
-                : []
-            }
-            height="450px"
-          />
-        )}
 
       {/* 오류 표시 */}
       {error && <div className="route-error">{error}</div>}
@@ -328,14 +276,9 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
         <div className="analysis-result">
           <div className={`overall-decision decision-${analysis.overallDecision.needsUmbrella ? 'bring' : 'skip'}`}>
             <div className="decision-icon">
-              {analysis.overallDecision.needsUmbrella ? '' : ''}
+              {analysis.overallDecision.needsUmbrella ? '☂️' : '☀️'}
             </div>
             <div className="decision-content">
-              <h3>
-                {analysis.overallDecision.needsUmbrella
-                  ? '우산을 챙기세요'
-                  : '우산 없이 이동 가능'}
-              </h3>
               <p>{analysis.overallDecision.message}</p>
             </div>
           </div>
@@ -349,32 +292,31 @@ export function RoutePlanner({ apiKey }: RoutePlannerProps) {
                   <span className="segment-route">
                     {segmentAnalysis.segment.from.name} → {segmentAnalysis.segment.to.name}
                   </span>
-                  <span className="segment-time">예상 소요: {segmentAnalysis.segment.estimatedTime}분</span>
                 </div>
 
                 {segmentAnalysis.rainDuringTravel ? (
                   <div className="segment-rain-warning">
                     <div className="rain-times">
-                      <strong>비 예상 시각:</strong>{' '}
-                      {segmentAnalysis.rainTimes.join(', ')}
+                      <strong>비 예상:</strong>{' '}
+                      {segmentAnalysis.rainTimes.map((t) => formatRelativeTime(t)).join(', ')}
                     </div>
                     <div className="rain-details">
                       <div>
-                        <strong>출발지 ({segmentAnalysis.segment.from.name}):</strong>{' '}
+                        <strong>{segmentAnalysis.segment.from.name}:</strong>{' '}
                         {segmentAnalysis.fromForecast.firstRainTime
-                          ? `${segmentAnalysis.fromForecast.firstRainTime}에 강수 시작`
-                          : '강수 예보 없음'}
+                          ? `${formatRelativeTime(segmentAnalysis.fromForecast.firstRainTime)} 비 시작`
+                          : '비 소식 없음'}
                       </div>
                       <div>
-                        <strong>목적지 ({segmentAnalysis.segment.to.name}):</strong>{' '}
+                        <strong>{segmentAnalysis.segment.to.name}:</strong>{' '}
                         {segmentAnalysis.toForecast.firstRainTime
-                          ? `${segmentAnalysis.toForecast.firstRainTime}에 강수 시작`
-                          : '강수 예보 없음'}
+                          ? `${formatRelativeTime(segmentAnalysis.toForecast.firstRainTime)} 비 시작`
+                          : '비 소식 없음'}
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="segment-no-rain">이동 중 강수 예보 없음</div>
+                  <div className="segment-no-rain">비 소식 없음</div>
                 )}
               </div>
             ))}

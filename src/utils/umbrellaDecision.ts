@@ -1,4 +1,5 @@
 import { RainfallForecast } from '../types';
+import { formatMinutes } from './timeFormat';
 
 /**
  * 우산 결정 도우미 유틸리티
@@ -7,7 +8,7 @@ import { RainfallForecast } from '../types';
 
 export interface UmbrellaDecision {
   score: number; // 0~100 우산 지수
-  recommendation: 'bring' | 'optional' | 'skip'; // bring: 챙기세요, optional: 선택, skip: 안 챙겨도 됨
+  recommendation: 'bring' | 'maybe' | 'skip'; // bring: 가져가, maybe: 고민된다, skip: 놔둬
   message: string; // 결정 문장
   icon: string; // 아이콘
   details: {
@@ -149,42 +150,34 @@ export function makeUmbrellaDecision(
   const isWasteful = !willGetWet && score < 30; // 강수 가능성이 낮으면 헛수고
 
   // 결정 생성
-  let recommendation: 'bring' | 'optional' | 'skip';
+  let recommendation: 'bring' | 'maybe' | 'skip';
   let message: string;
   let icon: string;
 
   if (score >= 60 || willGetWet) {
-    // 우산 챙기세요
     recommendation = 'bring';
     icon = '☂️';
-    
-    if (rainStartTime !== null && rainStartTime <= 20) {
-      message = `지금 안 들고 나가면 ${rainStartTime}분 안에 비 맞을 확률이 높아요`;
-    } else if (rainStartTime !== null) {
-      message = `이동 시간 ${travelTimeMinutes}분 기준, 중간에 비 시작 예상`;
+
+    if (rainStartTime !== null) {
+      message = `${rainStartTime}분 뒤에 비가 와요`;
     } else {
-      message = `이동 시간 동안 비가 올 예정입니다`;
+      message = `곧 비가 올 예정이에요`;
     }
   } else if (score >= 30) {
-    // 선택 영역
-    recommendation = 'optional';
+    recommendation = 'maybe';
     icon = '🤷‍♂️';
-    
-    if (rainStartTime !== null && rainStartTime > 20) {
-      message = `이동 후 비가 시작될 예정입니다. 선택하세요`;
+
+    if (rainStartTime !== null) {
+      message = `${formatMinutes(rainStartTime)} 뒤에 비가 올 수도 있어요`;
     } else {
-      message = `약한 비가 예상됩니다. 상황에 따라 결정하세요`;
+      message = `약한 비가 예상돼요`;
     }
   } else {
-    // 안 챙겨도 됨
     recommendation = 'skip';
     icon = '😌';
-    
-    if (rainStartTime !== null && rainStartTime > travelTimeMinutes) {
-      message = `지금 비 구간은 이동 후에 시작됩니다`;
-    } else {
-      message = `이동 시간 동안 비 예보 없습니다`;
-    }
+
+    const hoursAhead = Math.floor(travelTimeMinutes / 60);
+    message = `앞으로 ${hoursAhead > 0 ? `${hoursAhead}시간` : `${travelTimeMinutes}분`} 동안 비 소식 없어요`;
   }
 
   return {
