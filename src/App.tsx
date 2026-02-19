@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getCurrentLocation } from './utils/location';
 import { convertToGridCoordinates } from './utils/gridConverter';
 import { WeatherApiService } from './services/weatherApi';
@@ -15,7 +15,6 @@ function App() {
   const [apiKey, setApiKey] = useState<string>('');
   const [travelTime] = useState<number>(120); // 2시간 예보 전체 활용
   const [mode, setMode] = useState<'current' | 'route'>('current'); // 현재 위치 / 경로 모드
-  const adsenseLoadedRef = useRef(false);
 
   useEffect(() => {
     // 환경 변수에서 API 키 가져오기
@@ -137,32 +136,6 @@ function App() {
     if (forecasts.length === 0) return null;
     return makeUmbrellaDecision(forecasts, travelTime);
   }, [forecasts, travelTime]);
-
-  const hasPublisherContent = useMemo(() => {
-    // 콘텐츠 품질 이슈 방지를 위해 동네 외출 결과 화면에서만 광고를 노출한다.
-    return mode === 'current' && !loading && !error && forecasts.length > 0 && decision !== null;
-  }, [mode, loading, error, forecasts.length, decision]);
-
-  useEffect(() => {
-    if (!apiKey || !hasPublisherContent || adsenseLoadedRef.current) {
-      return;
-    }
-
-    const existingScript = document.getElementById('adsense-script');
-    if (existingScript) {
-      adsenseLoadedRef.current = true;
-      return;
-    }
-
-    const ad = document.createElement('script');
-    ad.id = 'adsense-script';
-    ad.src =
-      'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9702631091377733';
-    ad.crossOrigin = 'anonymous';
-    ad.async = true;
-    document.head.appendChild(ad);
-    adsenseLoadedRef.current = true;
-  }, [apiKey, hasPublisherContent]);
 
   if (!apiKey) {
   return (
